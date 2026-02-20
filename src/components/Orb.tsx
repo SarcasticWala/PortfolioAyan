@@ -221,7 +221,7 @@ export default function Orb({
 
     function resize() {
       if (!container) return;
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const width = container.clientWidth;
       const height = container.clientHeight;
       renderer.setSize(width * dpr, height * dpr);
@@ -266,6 +266,10 @@ export default function Orb({
     let rafId: number;
     const update = (t: number) => {
       rafId = requestAnimationFrame(update);
+      if (document.hidden) {
+        lastTime = t;
+        return;
+      }
       const dt = (t - lastTime) * 0.001;
       lastTime = t;
       program.uniforms.iTime.value = t * 0.001;
