@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 230 25% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 230 25% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 230 25% 12%;
+
+    --primary: 265 90% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 230 15% 92%;
+    --secondary-foreground: 230 25% 12%;
+
+    --muted: 230 10% 94%;
+    --muted-foreground: 230 10% 42%;
+
+    --accent: 200 100% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 230 15% 88%;
+    --input: 230 15% 88%;
+    --ring: 265 90% 55%;
+
+    --radius: 0.75rem;
+
+    --glow-primary: 265 90% 55%;
+    --glow-accent: 200 100% 45%;
+    --glass: 0 0% 100%;
+    --glass-border: 230 15% 85%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 230 25% 12%;
+    --sidebar-primary: 265 90% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 230 15% 92%;
+    --sidebar-accent-foreground: 230 25% 12%;
+    --sidebar-border: 230 15% 88%;
+    --sidebar-ring: 265 90% 55%;
+  }
+
+  .dark {
+    --background: 230 25% 7%;
+    --foreground: 220 20% 92%;
+
+    --card: 230 20% 10%;
+    --card-foreground: 220 20% 92%;
+
+    --popover: 230 20% 10%;
+    --popover-foreground: 220 20% 92%;
+
+    --primary: 265 90% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 230 20% 14%;
+    --secondary-foreground: 220 20% 92%;
+
+    --muted: 230 15% 16%;
+    --muted-foreground: 220 10% 55%;
+
+    --accent: 200 100% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 230 15% 18%;
+    --input: 230 15% 18%;
+    --ring: 265 90% 65%;
+
+    --radius: 0.75rem;
+
+    --glow-primary: 265 90% 65%;
+    --glow-accent: 200 100% 60%;
+    --glass: 230 20% 12%;
+    --glass-border: 230 15% 22%;
+
+    --sidebar-background: 230 25% 7%;
+    --sidebar-foreground: 220 20% 92%;
+    --sidebar-primary: 265 90% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 230 20% 14%;
+    --sidebar-accent-foreground: 220 20% 92%;
+    --sidebar-border: 230 15% 18%;
+    --sidebar-ring: 265 90% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-glass/60 backdrop-blur-xl border border-glass-border/50;
+  }
+
+  .glass-card {
+    @apply bg-glass/40 backdrop-blur-lg border border-glass-border/30 rounded-xl;
+  }
+
+  .glow-primary {
+    box-shadow: 0 0 20px hsl(var(--glow-primary) / 0.3),
+                0 0 60px hsl(var(--glow-primary) / 0.1);
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 20px hsl(var(--glow-accent) / 0.3),
+                0 0 60px hsl(var(--glow-accent) / 0.1);
+  }
+
+  .glow-border {
+    box-shadow: inset 0 0 0 1px hsl(var(--glow-primary) / 0.2),
+                0 0 15px hsl(var(--glow-primary) / 0.15);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  }
+
+  .bg-gradient-radial {
+    background: radial-gradient(ellipse at center, hsl(var(--primary) / 0.15) 0%, transparent 70%);
+  }
+
+  .grain {
+    position: relative;
+  }
+  .grain::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  @keyframes cardFlipScale {
+    0% {
+      transform: scale(2);
+      opacity: 0;
+      box-shadow: 0 0 50px hsl(var(--primary) / 0.5);
+    }
+    50% {
+      transform: translate(0, -5px) scale(1);
+      opacity: 1;
+      box-shadow: 0 8px 20px hsl(var(--primary) / 0.5);
+    }
+    100% {
+      transform: translate(0, 5px) scale(0.1);
+      opacity: 0;
+      box-shadow: 0 10px 20px hsl(var(--primary) / 0);
+    }
+  }
+}
