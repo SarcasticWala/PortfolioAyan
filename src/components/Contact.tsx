@@ -1,6 +1,5 @@
 import { memo, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { z } from "zod";
 import AnimatedSection from "./AnimatedSection";
 import { Send, Github, Linkedin, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +15,7 @@ const Contact = memo(() => {
   const [errors, setErrors] = useState<Partial<ContactFormType>>({});
   const [sending, setSending] = useState(false);
   const { toast } = useToast();
+  const contactApiUrl = import.meta.env.VITE_CONTACT_API_URL || "http://localhost:5000/api/contact";
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -26,14 +26,12 @@ const Contact = memo(() => {
   );
 
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault();
 
-      // Validate form with Zod
       const result = contactSchema.safeParse(form);
 
       if (!result.success) {
-        // Map errors
         const fieldErrors: Partial<ContactFormType> = {};
         result.error.errors.forEach((err) => {
           if (err.path[0]) fieldErrors[err.path[0] as keyof ContactFormType] = err.message;
@@ -44,18 +42,49 @@ const Contact = memo(() => {
 
       setSending(true);
 
-      // Simulate sending message
-      setTimeout(() => {
+      try {
+        const response = await fetch(contactApiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            message: form.message,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (data?.errors && typeof data.errors === "object") {
+            const fieldErrors: Partial<ContactFormType> = {};
+            if (Array.isArray(data.errors.name) && data.errors.name[0]) fieldErrors.name = data.errors.name[0];
+            if (Array.isArray(data.errors.email) && data.errors.email[0]) fieldErrors.email = data.errors.email[0];
+            if (Array.isArray(data.errors.message) && data.errors.message[0]) fieldErrors.message = data.errors.message[0];
+            setErrors(fieldErrors);
+          }
+          throw new Error(data?.message || "Failed to send message");
+        }
+
         toast({
           title: "Message sent!",
           description: "Thanks for reaching out. I'll get back to you soon.",
         });
         setForm({ name: "", email: "", message: "" });
         setErrors({});
+      } catch (error) {
+        toast({
+          title: "Failed to send",
+          description: error instanceof Error ? error.message : "Something went wrong",
+          variant: "destructive",
+        });
+      } finally {
         setSending(false);
-      }, 1000);
+      }
     },
-    [form, toast]
+    [contactApiUrl, form, toast]
   );
 
   return (
