@@ -6,6 +6,15 @@ import { useToast } from "@/hooks/use-toast";
 import MapEmbed from "./MapEmbed";
 import { contactSchema, ContactFormType } from "@/utils/contactSchema";
 
+type ContactApiError = {
+  message?: string;
+  errors?: {
+    name?: string[];
+    email?: string[];
+    message?: string[];
+  };
+};
+
 const Contact = memo(() => {
   const [form, setForm] = useState<ContactFormType>({
     name: "",
@@ -15,7 +24,9 @@ const Contact = memo(() => {
   const [errors, setErrors] = useState<Partial<ContactFormType>>({});
   const [sending, setSending] = useState(false);
   const { toast } = useToast();
-  const contactApiUrl = import.meta.env.VITE_CONTACT_API_URL || "https://portfolio-ayan-backend.vercel.app/api/contact";
+  const contactApiUrl =
+    import.meta.env.VITE_CONTACT_API_URL ||
+    (import.meta.env.DEV ? "http://localhost:5000/api/contact" : "");
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -43,6 +54,10 @@ const Contact = memo(() => {
       setSending(true);
 
       try {
+        if (!contactApiUrl) {
+          throw new Error("Contact API URL is not configured.");
+        }
+
         const response = await fetch(contactApiUrl, {
           method: "POST",
           headers: {
@@ -55,7 +70,13 @@ const Contact = memo(() => {
           }),
         });
 
-        const data = await response.json();
+        const raw = await response.text();
+        let data: ContactApiError | null = null;
+        try {
+          data = raw ? JSON.parse(raw) : null;
+        } catch {
+          data = null;
+        }
 
         if (!response.ok) {
           if (data?.errors && typeof data.errors === "object") {
@@ -65,7 +86,7 @@ const Contact = memo(() => {
             if (Array.isArray(data.errors.message) && data.errors.message[0]) fieldErrors.message = data.errors.message[0];
             setErrors(fieldErrors);
           }
-          throw new Error(data?.message || "Failed to send message");
+          throw new Error(data?.message || `Request failed (${response.status})`);
         }
 
         toast({
