@@ -1,30 +1,61 @@
 import { memo, useState, useCallback } from "react";
 import { motion } from "framer-motion";
+import { z } from "zod";
 import AnimatedSection from "./AnimatedSection";
 import { Send, Github, Linkedin, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import MapEmbed from "./MapEmbed";
+import { contactSchema, ContactFormType } from "@/utils/contactSchema";
 
 const Contact = memo(() => {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState<ContactFormType>({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [errors, setErrors] = useState<Partial<ContactFormType>>({});
   const [sending, setSending] = useState(false);
   const { toast } = useToast();
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  }, []);
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+      setErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
+    },
+    []
+  );
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
+
+      // Validate form with Zod
+      const result = contactSchema.safeParse(form);
+
+      if (!result.success) {
+        // Map errors
+        const fieldErrors: Partial<ContactFormType> = {};
+        result.error.errors.forEach((err) => {
+          if (err.path[0]) fieldErrors[err.path[0] as keyof ContactFormType] = err.message;
+        });
+        setErrors(fieldErrors);
+        return;
+      }
+
       setSending(true);
+
+      // Simulate sending message
       setTimeout(() => {
-        toast({ title: "Message sent!", description: "Thanks for reaching out. I'll get back to you soon." });
+        toast({
+          title: "Message sent!",
+          description: "Thanks for reaching out. I'll get back to you soon.",
+        });
         setForm({ name: "", email: "", message: "" });
+        setErrors({});
         setSending(false);
       }, 1000);
     },
-    [toast]
+    [form, toast]
   );
 
   return (
@@ -72,33 +103,36 @@ const Contact = memo(() => {
               name="name"
               value={form.name}
               onChange={handleChange}
-              required
               placeholder="Your Name"
               className="w-full bg-secondary/50 border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all duration-300"
             />
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
           </div>
+
           <div>
             <input
               type="email"
               name="email"
               value={form.email}
               onChange={handleChange}
-              required
               placeholder="Your Email"
               className="w-full bg-secondary/50 border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all duration-300"
             />
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
           </div>
+
           <div>
             <textarea
               name="message"
               value={form.message}
               onChange={handleChange}
-              required
               rows={5}
               placeholder="Your Message"
               className="w-full bg-secondary/50 border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all duration-300 resize-none"
             />
+            {errors.message && <p className="text-red-500 text-sm mt-1">{errors.message}</p>}
           </div>
+
           <motion.button
             type="submit"
             disabled={sending}
@@ -122,7 +156,7 @@ const Contact = memo(() => {
           {[
             { icon: Github, href: "https://github.com/SarcasticWala", label: "GitHub" },
             { icon: Linkedin, href: "https://linkedin.com/in/ayandas", label: "LinkedIn" },
-            { icon: Mail, href: "mailto:ayan@example.com", label: "Email" },
+            { icon: Mail, href: "mailto:dasayan948@gmail.com", label: "Email" },
           ].map((s) => (
             <motion.a
               key={s.label}
