@@ -3,11 +3,6 @@ import mongoose from "mongoose";
 const MONGO_URI = process.env.MONGO_URI;
 const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME || "portfolio";
 
-if (!MONGO_URI) {
-  throw new Error("MONGO_URI is required in Vercel Environment Variables");
-}
-const mongoUri = MONGO_URI;
-
 type MongooseCache = {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
@@ -22,10 +17,14 @@ const cache: MongooseCache = global.__mongoose_cache__ || { conn: null, promise:
 global.__mongoose_cache__ = cache;
 
 export async function connectMongo() {
+  if (!MONGO_URI) {
+    throw new Error("MONGO_URI is required in Vercel Environment Variables");
+  }
+
   if (cache.conn) return cache.conn;
 
   if (!cache.promise) {
-    cache.promise = mongoose.connect(mongoUri, {
+    cache.promise = mongoose.connect(MONGO_URI, {
       dbName: MONGODB_DB_NAME,
     });
   }

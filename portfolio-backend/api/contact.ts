@@ -5,6 +5,7 @@ import { connectMongo } from "./_lib/mongo";
 type ApiRequest = {
   method?: string;
   body?: unknown;
+  headers?: Record<string, string | string[] | undefined>;
 };
 
 type ApiResponse = {
@@ -33,18 +34,36 @@ const ContactMessage =
   mongoose.models.ContactMessage ||
   mongoose.model("ContactMessage", ContactMessageSchema);
 
-function setCors(res: ApiResponse) {
-  const origin = process.env.ALLOWED_ORIGIN || "*";
-  res.setHeader("Access-Control-Allow-Origin", origin);
+function getRequestOrigin(req: ApiRequest) {
+  const origin = req.headers?.origin;
+  if (Array.isArray(origin)) return origin[0];
+  return origin;
+}
+
+function setCors(req: ApiRequest, res: ApiResponse) {
+  const configured = (process.env.ALLOWED_ORIGIN || "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+
+  const requestOrigin = getRequestOrigin(req);
+
+  if (configured.length === 0) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+  } else if (requestOrigin && configured.includes(requestOrigin)) {
+    res.setHeader("Access-Control-Allow-Origin", requestOrigin);
+    res.setHeader("Vary", "Origin");
+  }
+
   res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 }
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
-  setCors(res);
+  setCors(req, res);
 
   if (req.method === "OPTIONS") {
-    return res.status(200).end();
+    return res.status(204).end();
   }
 
   if (req.method !== "POST") {
