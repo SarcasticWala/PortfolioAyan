@@ -26,7 +26,7 @@ const Contact = memo(() => {
   const { toast } = useToast();
   const contactApiUrl =
     import.meta.env.VITE_CONTACT_API_URL ||
-    (import.meta.env.DEV ? "http://localhost:5000/api/contact" : "");
+    (import.meta.env.DEV ? "http://localhost:5000/api/contact" : "/api/contact");
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -231,3 +231,4 @@ const Contact = memo(() => {
 
 Contact.displayName = "Contact";
 export default Contact;
+

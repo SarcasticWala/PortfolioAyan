@@ -1,20 +1,8 @@
 {
   "version": 2,
-  "name": "portfolio-backend",
-  "builds": [
-    {
-      "src": "server.ts",
-      "use": "@vercel/node"
+  "functions": {
+    "api/*.ts": {
+      "runtime": "@vercel/node"
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/server.js"
-    }
-  ],
-  "env": {
-    "MONGO_URI": "@mongo-uri"
-    
   }
 }
