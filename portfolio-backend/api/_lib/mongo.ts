@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGO_URI = process.env.MONGO_URI;
 const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME || "portfolio";
 
-if (!MONGODB_URI) {
-  throw new Error("MONGODB_URI is required in Vercel Environment Variables");
+if (!MONGO_URI) {
+  throw new Error("MONGO_URI is required in Vercel Environment Variables");
 }
-const mongoUri = MONGODB_URI;
+const mongoUri = MONGO_URI;
 
 type MongooseCache = {
   conn: typeof mongoose | null;

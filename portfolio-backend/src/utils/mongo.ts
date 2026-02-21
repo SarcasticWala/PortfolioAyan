@@ -16,15 +16,15 @@ for (const envPath of envCandidates) {
   }
 }
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGO_URI = process.env.MONGO_URI;
 const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME || "portfolio";
-if (!MONGODB_URI) {
-  throw new Error("MONGODB_URI is required. Set it in portfolio-backend/.env");
+if (!MONGO_URI) {
+  throw new Error("MONGO_URI is required. Set it in portfolio-backend/.env");
 }
-if (MONGODB_URI.includes("<username>") || MONGODB_URI.includes("<password>")) {
-  throw new Error("MONGODB_URI is still using placeholders. Replace <username> and <password>.");
+if (MONGO_URI.includes("<username>") || MONGO_URI.includes("<password>")) {
+  throw new Error("MONGO_URI is still using placeholders. Replace <username> and <password>.");
 }
-const mongoUri = MONGODB_URI;
+const mongoUri = MONGO_URI;
 
 export async function connectMongo() {
   if (mongoose.connection.readyState === 1) {

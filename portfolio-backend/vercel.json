@@ -14,7 +14,7 @@
     }
   ],
   "env": {
-    "MONGODB_URI": "@mongo-uri"
+    "MONGO_URI": "@mongo-uri"
     
   }
 }
