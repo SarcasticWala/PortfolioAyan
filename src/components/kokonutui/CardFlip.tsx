@@ -30,26 +30,28 @@ const CardFlip = memo(function CardFlip({
 
   return (
     <div
-      className="group relative h-[320px] w-full [perspective:2000px]"
+      className="group relative h-[420px] w-full [perspective:2000px]"
       onMouseEnter={() => setIsFlipped(true)}
       onMouseLeave={() => setIsFlipped(false)}
     >
-      <div
+      <motion.div
         className={cn(
-          "relative h-full w-full transition-transform duration-700",
-          "[transform-style:preserve-3d]",
-          isFlipped ? "[transform:rotateY(180deg)]" : "[transform:rotateY(0deg)]"
+          "relative h-full w-full",
+          "[transform-style:preserve-3d]"
         )}
+        animate={{ rotateY: isFlipped ? 180 : 0 }}
+        transition={{ duration: 0.7 }}
+        style={{ transformStyle: "preserve-3d" }}
       >
         {/* ================= FRONT ================= */}
         <div
           className={cn(
             "absolute inset-0 rounded-2xl overflow-hidden",
             "border border-border bg-card",
-            "[backface-visibility:hidden]"
+            "[backface-visibility:hidden]",
+            isFlipped ? "pointer-events-none" : "pointer-events-auto"
           )}
         >
-          {/* Image */}
           {imageSrc && (
             <div className="absolute inset-0">
               <img
@@ -61,7 +63,6 @@ const CardFlip = memo(function CardFlip({
             </div>
           )}
 
-          {/* Text */}
           <div className="relative z-10 flex h-full flex-col justify-end p-5">
             <motion.h3
               initial={{ opacity: 0, y: 12 }}
@@ -95,11 +96,12 @@ const CardFlip = memo(function CardFlip({
             "absolute inset-0 rounded-2xl p-6",
             "bg-card border border-border",
             "[transform:rotateY(180deg)] [backface-visibility:hidden]",
-            "flex flex-col"
+            "flex flex-col",
+            isFlipped ? "pointer-events-auto" : "pointer-events-none"
           )}
+          onClick={(e) => e.stopPropagation()}
         >
           <div className="flex-1 space-y-4 overflow-hidden">
-            {/* Gradient title like section headings */}
             <h3 className="text-lg font-bold">
               <span className="text-gradient">{title}</span>
             </h3>
@@ -130,35 +132,64 @@ const CardFlip = memo(function CardFlip({
 
           {/* Actions */}
           <div className="pt-4 mt-4 border-t border-border flex gap-2">
-            <a
-              href={ctaHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 flex items-center justify-between rounded-lg px-3 py-2
+            {ctaHref && ctaHref !== "#" ? (
+              <a
+                href={ctaHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-between rounded-lg px-3 py-2
                          bg-secondary hover:bg-primary/10 transition"
-            >
-              <span className="text-sm font-medium">{ctaLabel}</span>
-              <ArrowRight className="h-4 w-4 text-primary" />
-            </a>
-
-            <a
-              href={githubHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-11 flex items-center justify-center rounded-lg
-                         bg-secondary hover:bg-primary/10 transition"
-            >
-              <svg
-                className="h-4 w-4"
-                viewBox="0 0 24 24"
-                fill="currentColor"
+                onClick={(e) => e.stopPropagation()}
               >
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58 0-.28-.01-1.04-.02-2.03-3.34.73-4.04-1.61-4.04-1.61-.55-1.38-1.34-1.75-1.34-1.75-1.09-.75.08-.74.08-.74 1.21.09 1.84 1.23 1.84 1.23 1.07 1.84 2.81 1.31 3.49 1 .11-.78.42-1.31.77-1.61-2.67-.3-5.47-1.33-5.47-5.94 0-1.31.47-2.38 1.23-3.22-.12-.3-.53-1.53.12-3.18 0 0 1.01-.32 3.3 1.23A11.48 11.48 0 0 1 12 6.8c1.02.01 2.05.14 3.01.42 2.29-1.55 3.29-1.23 3.29-1.23.66 1.65.25 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.62-2.8 5.63-5.48 5.93.43.37.82 1.1.82 2.22 0 1.61-.01 2.91-.01 3.31 0 .32.21.69.83.57A12.01 12.01 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
-              </svg>
-            </a>
+                <span className="text-sm font-medium">{ctaLabel}</span>
+                <ArrowRight className="h-4 w-4 text-primary" />
+              </a>
+            ) : (
+              <button
+                disabled
+                className="flex-1 flex items-center justify-between rounded-lg px-3 py-2
+                         bg-secondary opacity-50 cursor-not-allowed"
+              >
+                <span className="text-sm font-medium">{ctaLabel}</span>
+                <ArrowRight className="h-4 w-4 text-primary" />
+              </button>
+            )}
+
+            {githubHref && githubHref !== "#" ? (
+              <a
+                href={githubHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-11 flex items-center justify-center rounded-lg
+                         bg-secondary hover:bg-primary/10 transition"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58 0-.28-.01-1.04-.02-2.03-3.34.73-4.04-1.61-4.04-1.61-.55-1.38-1.34-1.75-1.34-1.75-1.09-.75.08-.74.08-.74 1.21.09 1.84 1.23 1.84 1.23 1.07 1.84 2.81 1.31 3.49 1 .11-.78.42-1.31.77-1.61-2.67-.3-5.47-1.33-5.47-5.94 0-1.31.47-2.38 1.23-3.22-.12-.3-.53-1.53.12-3.18 0 0 1.01-.32 3.3 1.23A11.48 11.48 0 0 1 12 6.8c1.02.01 2.05.14 3.01.42 2.29-1.55 3.29-1.23 3.29-1.23.66 1.65.25 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.62-2.8 5.63-5.48 5.93.43.37.82 1.1.82 2.22 0 1.61-.01 2.91-.01 3.31 0 .32.21.69.83.57A12.01 12.01 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+              </a>
+            ) : (
+              <button
+                disabled
+                className="w-11 flex items-center justify-center rounded-lg
+                         bg-secondary opacity-50 cursor-not-allowed"
+              >
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58 0-.28-.01-1.04-.02-2.03-3.34.73-4.04-1.61-4.04-1.61-.55-1.38-1.34-1.75-1.34-1.75-1.09-.75.08-.74.08-.74 1.21.09 1.84 1.23 1.84 1.23 1.07 1.84 2.81 1.31 3.49 1 .11-.78.42-1.31.77-1.61-2.67-.3-5.47-1.33-5.47-5.94 0-1.31.47-2.38 1.23-3.22-.12-.3-.53-1.53.12-3.18 0 0 1.01-.32 3.3 1.23A11.48 11.48 0 0 1 12 6.8c1.02.01 2.05.14 3.01.42 2.29-1.55 3.29-1.23 3.29-1.23.66 1.65.25 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.62-2.8 5.63-5.48 5.93.43.37.82 1.1.82 2.22 0 1.61-.01 2.91-.01 3.31 0 .32.21.69.83.57A12.01 12.01 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 });
