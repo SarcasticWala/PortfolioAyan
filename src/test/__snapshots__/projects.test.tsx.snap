@@ -1,0 +1,156 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Projects component > renders all featured projects and matches snapshot 1`] = `
+<section
+  class="py-24 relative"
+  style="opacity: 0; transform: translateY(40px);"
+>
+  <div
+    class="absolute -top-20"
+    id="projects"
+  />
+  <div
+    class="container mx-auto px-6"
+  >
+    <p
+      class="text-sm font-mono text-primary mb-2 tracking-widest uppercase"
+      style="opacity: 0;"
+    >
+      Projects
+    </p>
+    <h2
+      class="text-3xl sm:text-4xl font-bold mb-12"
+      style="opacity: 0; transform: translateY(20px);"
+    >
+      Featured 
+      <span
+        class="text-gradient"
+      >
+        Work
+      </span>
+    </h2>
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+    >
+      <div
+        style="opacity: 0; transform: translateY(30px);"
+      >
+        <article
+          data-testid="project-card"
+        >
+          <h3>
+            CodeSphere
+          </h3>
+          <p>
+            Collaborative Code Editor
+          </p>
+          <a
+            href="https://code-sphere-editor.vercel.app/"
+          >
+            Live
+          </a>
+          <a
+            href="https://github.com/SarcasticWala/Code_Sphere"
+          >
+            GitHub
+          </a>
+        </article>
+      </div>
+      <div
+        style="opacity: 0; transform: translateY(30px);"
+      >
+        <article
+          data-testid="project-card"
+        >
+          <h3>
+            Esperenza 2k25
+          </h3>
+          <p>
+            College Festival Website
+          </p>
+          <a
+            href="https://www.esperanza.org.in/"
+          >
+            Live
+          </a>
+          <a
+            href="https://github.com/SarcasticWala/Esperanza_2k25"
+          >
+            GitHub
+          </a>
+        </article>
+      </div>
+      <div
+        style="opacity: 0; transform: translateY(30px);"
+      >
+        <article
+          data-testid="project-card"
+        >
+          <h3>
+            TathaagatFoundation
+          </h3>
+          <p>
+            NGO Website
+          </p>
+          <a
+            href="#"
+          >
+            Live
+          </a>
+          <a
+            href="#"
+          >
+            GitHub
+          </a>
+        </article>
+      </div>
+      <div
+        style="opacity: 0; transform: translateY(30px);"
+      >
+        <article
+          data-testid="project-card"
+        >
+          <h3>
+            Chat-A-Verse
+          </h3>
+          <p>
+            Chat Application 
+          </p>
+          <a
+            href="https://chat-a-verse-backend.onrender.com/"
+          >
+            Live
+          </a>
+          <a
+            href="https://github.com/SarcasticWala/Chat_Application"
+          >
+            GitHub
+          </a>
+        </article>
+      </div>
+      <div
+        style="opacity: 0; transform: translateY(30px);"
+      >
+        <article
+          data-testid="project-card"
+        >
+          <h3>
+            expense-tracker
+          </h3>
+          <p />
+          <a
+            href="https://tathaagat.vercel.app/"
+          >
+            Live
+          </a>
+          <a
+            href="https://github.com/SarcasticWala/Tathaagat"
+          >
+            GitHub
+          </a>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+`;
