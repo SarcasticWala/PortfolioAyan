@@ -1,6 +1,5 @@
 import { memo, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ArrowDown } from "lucide-react";
 import AuroraBackground from "./ui/aurora-background";
 
 const roles = ["MERN Stack Developer", "React Developer", "Full Stack Engineer", "UI/UX Enthusiast"];
@@ -129,23 +128,6 @@ const Hero = memo(() => {
             className="px-8 py-3 rounded-lg border border-border text-foreground font-medium hover:border-primary/50 hover:glow-border transition-all duration-300"
           >
             Contact Me
-          </motion.button>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <motion.button
-            onClick={() => scrollTo("#about")}
-            aria-label="Scroll to about"
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="text-muted-foreground hover:text-primary transition-colors"
-          >
-            <ArrowDown size={20} />
           </motion.button>
         </motion.div>
       </div>
