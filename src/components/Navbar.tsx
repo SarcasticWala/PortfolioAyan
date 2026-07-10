@@ -31,6 +31,11 @@ const Navbar = memo(() => {
     document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
+  const scrollToTop = useCallback(() => {
+    setIsOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   // Detect hash on scroll
   useEffect(() => {
     const handleScroll = () => {
@@ -87,7 +92,7 @@ const Navbar = memo(() => {
         {/* Mobile bar */}
         <div className="md:hidden inline-flex items-center gap-3 pl-5 pr-2 py-2 border border-white/15 rounded-full bg-white/10 backdrop-blur-md shadow-lg">
           <button
-            onClick={() => handleClick("#hero")}
+            onClick={scrollToTop}
             className="font-secondary text-base font-bold text-white"
           >
             Ayan Das
@@ -128,9 +133,12 @@ const Navbar = memo(() => {
             >
               {/* header */}
               <div className="flex items-center justify-between px-6 py-6">
-                <span className="font-secondary text-lg font-bold text-gradient">
+                <button
+                  onClick={scrollToTop}
+                  className="font-secondary text-lg font-bold text-gradient"
+                >
                   Ayan Das
-                </span>
+                </button>
                 <button
                   onClick={close}
                   aria-label="Close menu"

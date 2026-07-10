@@ -47,11 +47,25 @@ function contactApiDevPlugin(env: Record<string, string>): PluginOption {
         }
 
         try {
-          // Read raw body
+          // Read raw body with a size cap to avoid unbounded memory use.
           const chunks: Buffer[] = [];
-          for await (const chunk of req) chunks.push(chunk as Buffer);
+          let total = 0;
+          for await (const chunk of req) {
+            total += (chunk as Buffer).length;
+            if (total > 20_000) {
+              send(413, { message: "Payload too large" });
+              return;
+            }
+            chunks.push(chunk as Buffer);
+          }
           const raw = Buffer.concat(chunks).toString("utf8");
           const payload = raw ? JSON.parse(raw) : {};
+
+          // Honeypot: silently accept (but don't store) if the hidden field is set.
+          if (typeof payload.company === "string" && payload.company.trim() !== "") {
+            send(201, { message: "Message sent successfully" });
+            return;
+          }
 
           // Validate (mirrors src/utils/contactSchema.ts)
           const name = String(payload.name ?? "").trim();

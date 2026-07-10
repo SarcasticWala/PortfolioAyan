@@ -22,6 +22,7 @@ const Contact = memo(() => {
     message: "",
   });
   const [errors, setErrors] = useState<Partial<ContactFormType>>({});
+  const [company, setCompany] = useState(""); // honeypot — must stay empty
   const [sending, setSending] = useState(false);
   const { toast } = useToast();
   const contactApiUrl = import.meta.env.VITE_CONTACT_API_URL || "/api/contact";
@@ -65,6 +66,7 @@ const Contact = memo(() => {
             name: form.name,
             email: form.email,
             message: form.message,
+            company, // honeypot
           }),
         });
 
@@ -103,7 +105,7 @@ const Contact = memo(() => {
         setSending(false);
       }
     },
-    [contactApiUrl, form, toast]
+    [contactApiUrl, form, company, toast]
   );
 
   return (
@@ -145,6 +147,18 @@ const Contact = memo(() => {
           onSubmit={handleSubmit}
           className="glass-card p-8 space-y-5"
         >
+          {/* Honeypot: hidden from users, only bots fill it. */}
+          <input
+            type="text"
+            name="company"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="absolute left-[-9999px] h-0 w-0 opacity-0"
+          />
+
           <div>
             <input
               type="text"
@@ -152,6 +166,8 @@ const Contact = memo(() => {
               value={form.name}
               onChange={handleChange}
               placeholder="Your Name"
+              aria-label="Your name"
+              autoComplete="name"
               className="w-full bg-secondary/50 border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all duration-300"
             />
             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
@@ -164,6 +180,8 @@ const Contact = memo(() => {
               value={form.email}
               onChange={handleChange}
               placeholder="Your Email"
+              aria-label="Your email"
+              autoComplete="email"
               className="w-full bg-secondary/50 border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all duration-300"
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
@@ -176,6 +194,8 @@ const Contact = memo(() => {
               onChange={handleChange}
               rows={5}
               placeholder="Your Message"
+              aria-label="Your message"
+              maxLength={5000}
               className="w-full bg-secondary/50 border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all duration-300 resize-none"
             />
             {errors.message && <p className="text-red-500 text-sm mt-1">{errors.message}</p>}

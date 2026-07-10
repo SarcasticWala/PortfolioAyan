@@ -61,12 +61,25 @@ export default async function handler(req: Req, res: Res) {
   // Vercel parses JSON bodies automatically, but guard against strings/undefined.
   let payload: unknown = req.body;
   if (typeof payload === "string") {
+    // Reject oversized raw bodies before doing any work.
+    if (payload.length > 20_000) {
+      res.status(413).json({ message: "Payload too large" });
+      return;
+    }
     try {
       payload = payload ? JSON.parse(payload) : {};
     } catch {
       res.status(400).json({ message: "Invalid JSON body" });
       return;
     }
+  }
+
+  // Honeypot: bots fill hidden fields. Real users never do. Pretend success so
+  // bots don't retry, but store nothing.
+  const honeypot = (payload as { company?: unknown } | null)?.company;
+  if (typeof honeypot === "string" && honeypot.trim() !== "") {
+    res.status(201).json({ message: "Message sent successfully" });
+    return;
   }
 
   const result = contactSchema.safeParse(payload ?? {});
@@ -78,12 +91,11 @@ export default async function handler(req: Req, res: Res) {
     return;
   }
 
-  // Fail fast with a clear message if the connection string is missing.
+  // Config/DB errors are logged server-side (visible in Vercel logs) but never
+  // exposed to the client, to avoid leaking internal details.
   if (!uri) {
-    res.status(500).json({
-      message: "Server not configured: MONGODB_URI is missing.",
-      detail: "MONGODB_URI env var is not set in Vercel.",
-    });
+    console.error("Contact API: MONGODB_URI is not set.");
+    res.status(500).json({ message: "Failed to send message. Please try again later." });
     return;
   }
 
@@ -99,10 +111,6 @@ export default async function handler(req: Req, res: Res) {
     res.status(201).json({ message: "Message sent successfully" });
   } catch (error) {
     console.error("Failed to save contact message:", error);
-    // Temporary: surface the real reason so prod issues can be diagnosed.
-    res.status(500).json({
-      message: "Failed to send message. Please try again later.",
-      detail: error instanceof Error ? `${error.name}: ${error.message}` : String(error),
-    });
+    res.status(500).json({ message: "Failed to send message. Please try again later." });
   }
 }
