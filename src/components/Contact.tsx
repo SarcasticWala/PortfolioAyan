@@ -203,7 +203,7 @@ const Contact = memo(() => {
         >
           {[
             { icon: Github, href: "https://github.com/SarcasticWala", label: "GitHub" },
-            { icon: Linkedin, href: "https://linkedin.com/in/ayandas", label: "LinkedIn" },
+            { icon: Linkedin, href: "https://www.linkedin.com/in/ayan-das-cse39/", label: "LinkedIn" },
             { icon: Mail, href: "mailto:dasayan948@gmail.com", label: "Email" },
           ].map((s) => (
             <motion.a
