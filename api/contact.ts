@@ -78,6 +78,15 @@ export default async function handler(req: Req, res: Res) {
     return;
   }
 
+  // Fail fast with a clear message if the connection string is missing.
+  if (!uri) {
+    res.status(500).json({
+      message: "Server not configured: MONGODB_URI is missing.",
+      detail: "MONGODB_URI env var is not set in Vercel.",
+    });
+    return;
+  }
+
   try {
     const { db } = await connect();
     await db.collection(collectionName).insertOne({
@@ -90,6 +99,10 @@ export default async function handler(req: Req, res: Res) {
     res.status(201).json({ message: "Message sent successfully" });
   } catch (error) {
     console.error("Failed to save contact message:", error);
-    res.status(500).json({ message: "Failed to send message. Please try again later." });
+    // Temporary: surface the real reason so prod issues can be diagnosed.
+    res.status(500).json({
+      message: "Failed to send message. Please try again later.",
+      detail: error instanceof Error ? `${error.name}: ${error.message}` : String(error),
+    });
   }
 }
