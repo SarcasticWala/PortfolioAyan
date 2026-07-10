@@ -83,8 +83,30 @@ function contactApiDevPlugin(env: Record<string, string>): PluginOption {
           const { MongoClient } = await import("mongodb");
           if (!clientPromise) clientPromise = MongoClient.connect(uri);
           const client = await clientPromise;
-          await client
-            .db(dbName)
+          const db = client.db(dbName);
+
+          // Rate limit per IP (mirrors api/contact.ts).
+          const RATE_LIMIT = 5;
+          const RATE_WINDOW_MS = 60_000;
+          const xff = req.headers["x-forwarded-for"];
+          const fwd = Array.isArray(xff) ? xff[0] : xff;
+          const ip = (fwd ? fwd.split(",")[0].trim() : req.socket?.remoteAddress) || "unknown";
+          const hits = db.collection("rate_limits");
+          await hits
+            .createIndex({ createdAt: 1 }, { expireAfterSeconds: 120 })
+            .catch(() => {});
+          const now = new Date();
+          await hits.insertOne({ ip, createdAt: now });
+          const recent = await hits.countDocuments({
+            ip,
+            createdAt: { $gte: new Date(now.getTime() - RATE_WINDOW_MS) },
+          });
+          if (recent > RATE_LIMIT) {
+            send(429, { message: "Too many requests. Please try again in a minute." });
+            return;
+          }
+
+          await db
             .collection(collectionName)
             .insertOne({ name, email, message, createdAt: new Date() });
 

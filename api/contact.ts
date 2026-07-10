@@ -17,17 +17,34 @@ const collectionName = process.env.MONGODB_COLLECTION || "messages";
 type Cached = { client: MongoClient; db: Db };
 let cached: Promise<Cached> | null = null;
 
+// Rate limiting (shared across serverless instances via MongoDB).
+const RATE_LIMIT = 5; // max submissions
+const RATE_WINDOW_MS = 60_000; // per 60 seconds, per IP
+
 function connect(): Promise<Cached> {
   if (!uri) {
     throw new Error("MONGODB_URI environment variable is not set");
   }
   if (!cached) {
-    cached = MongoClient.connect(uri).then((client) => ({
-      client,
-      db: client.db(dbName),
-    }));
+    cached = MongoClient.connect(uri).then(async (client) => {
+      const db = client.db(dbName);
+      // TTL index so rate-limit records auto-expire (created once per cold start).
+      await db
+        .collection("rate_limits")
+        .createIndex({ createdAt: 1 }, { expireAfterSeconds: 120 })
+        .catch(() => {});
+      return { client, db };
+    });
   }
   return cached;
+}
+
+function getClientIp(req: Req): string {
+  const xff = req.headers["x-forwarded-for"];
+  const fwd = Array.isArray(xff) ? xff[0] : xff;
+  if (fwd) return fwd.split(",")[0].trim();
+  const real = req.headers["x-real-ip"];
+  return (Array.isArray(real) ? real[0] : real) || "unknown";
 }
 
 // Minimal structural typing so we don't need the @vercel/node package.
@@ -101,6 +118,21 @@ export default async function handler(req: Req, res: Res) {
 
   try {
     const { db } = await connect();
+
+    // Rate limit per IP using a shared, TTL-expiring collection.
+    const ip = getClientIp(req);
+    const now = new Date();
+    const hits = db.collection("rate_limits");
+    await hits.insertOne({ ip, createdAt: now });
+    const recent = await hits.countDocuments({
+      ip,
+      createdAt: { $gte: new Date(now.getTime() - RATE_WINDOW_MS) },
+    });
+    if (recent > RATE_LIMIT) {
+      res.status(429).json({ message: "Too many requests. Please try again in a minute." });
+      return;
+    }
+
     await db.collection(collectionName).insertOne({
       name: result.data.name,
       email: result.data.email,
