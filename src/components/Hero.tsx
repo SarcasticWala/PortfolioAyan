@@ -1,6 +1,7 @@
 import { memo, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
+import AuroraBackground from "./ui/aurora-background";
 
 const roles = ["MERN Stack Developer", "React Developer", "Full Stack Engineer", "UI/UX Enthusiast"];
 
@@ -37,6 +38,21 @@ const Hero = memo(() => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden grain">
+      {/* Aurora backdrop */}
+      <AuroraBackground />
+
+      {/* Subtle grid */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.15] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, hsl(var(--foreground) / 0.12) 1px, transparent 1px)," +
+            "linear-gradient(to bottom, hsl(var(--foreground) / 0.12) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+      />
+
       {/* Ambient glow */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-radial rounded-full blur-3xl animate-pulse-glow pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl animate-pulse-glow pointer-events-none" style={{ background: "radial-gradient(ellipse, hsl(200 100% 60% / 0.1), transparent 70%)" }} />
@@ -74,7 +90,7 @@ const Hero = memo(() => {
           transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
           className="text-5xl sm:text-7xl lg:text-8xl font-black mb-6 tracking-tight"
         >
-          <span className="text-gradient">Ayan Das</span>
+          <span className="text-gradient bg-[length:200%_auto] animate-gradient-shift">Ayan Das</span>
         </motion.h1>
 
         <motion.div
@@ -97,9 +113,14 @@ const Hero = memo(() => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => scrollTo("#projects")}
-            className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-medium glow-primary transition-all duration-300"
+            className="group relative overflow-hidden px-8 py-3 rounded-lg bg-primary text-primary-foreground font-medium glow-primary transition-all duration-300"
           >
-            View Projects
+            <span className="relative z-10">View Projects</span>
+            {/* shine sweep */}
+            <span
+              aria-hidden
+              className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-shimmer"
+            />
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -117,13 +138,15 @@ const Hero = memo(() => {
           transition={{ delay: 1.5, duration: 1 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
         >
-          <motion.div
+          <motion.button
+            onClick={() => scrollTo("#about")}
+            aria-label="Scroll to about"
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
+            className="text-muted-foreground hover:text-primary transition-colors"
           >
-            
-            
-          </motion.div>
+            <ArrowDown size={20} />
+          </motion.button>
         </motion.div>
       </div>
     </section>

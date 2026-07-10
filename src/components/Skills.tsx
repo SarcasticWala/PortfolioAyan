@@ -3,13 +3,15 @@ import { motion } from "framer-motion";
 import AnimatedSection from "./AnimatedSection";
 import ToolboxItems from "./ToolboxItems";
 
-import { FaReact, FaNodeJs, FaGit, FaDocker, FaHtml5, FaCss3Alt } from "react-icons/fa";
+import { FaReact, FaNodeJs, FaGit, FaDocker, FaHtml5, FaCss3Alt, FaTheaterMasks } from "react-icons/fa";
 import {
   SiExpress,
   SiMongodb,
   SiTypescript,
   SiTailwindcss,
   SiJavascript,
+  SiPostman,
+  SiJenkins,
 } from "react-icons/si";
 
 const toolboxItems = [
@@ -24,6 +26,10 @@ const toolboxItems = [
   { title: "Git", iconType: FaGit },
   { title: "Html", iconType: FaHtml5 },
   { title: "Css", iconType: FaCss3Alt },
+  { title: "Postman", iconType: SiPostman },
+  { title: "Jenkins", iconType: SiJenkins },
+  // react-icons (this version) has no SiPlaywright; the theater-masks glyph is Playwright's logo motif.
+  { title: "Playwright", iconType: FaTheaterMasks },
 ];
 
 const Skills = memo(() => {

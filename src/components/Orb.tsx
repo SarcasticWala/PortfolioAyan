@@ -1,5 +1,5 @@
  import { Mesh, Program, Renderer, Triangle, Vec3 } from 'ogl';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface OrbProps {
   hue?: number;
@@ -17,6 +17,11 @@ export default function Orb({
   backgroundColor = '#000000'
 }: OrbProps) {
   const ctnDom = useRef<HTMLDivElement>(null);
+  const [webglFailed, setWebglFailed] = useState(false);
+  // Bumped to retry WebGL init when a context wasn't available (e.g. too many
+  // open WebGL tabs). Lets the real orb recover automatically once one frees up.
+  const [retry, setRetry] = useState(0);
+  const attemptsRef = useRef(0);
 
   const vert = /* glsl */ `
     precision highp float;
@@ -195,10 +200,60 @@ export default function Orb({
     const container = ctnDom.current;
     if (!container) return;
 
-    const renderer = new Renderer({ alpha: true, premultipliedAlpha: false });
+    // WebGL can be unavailable (hardware acceleration off, GPU blocklisted, or
+    // too many live contexts). Fail gracefully so this decorative background
+    // never crashes the whole app.
+    // Schedule an automatic retry so the real orb recovers once a WebGL context
+    // frees up (e.g. after other WebGL tabs are closed).
+    const scheduleRetry = (err?: unknown) => {
+      console.warn("Orb: WebGL context unavailable, showing CSS fallback.", err ?? "");
+      setWebglFailed(true);
+      if (attemptsRef.current < 12) {
+        attemptsRef.current += 1;
+        const t = setTimeout(() => setRetry((r) => r + 1), 2500);
+        return () => clearTimeout(t);
+      }
+      return undefined;
+    };
+
+    let renderer: Renderer;
+    try {
+      renderer = new Renderer({ alpha: true, premultipliedAlpha: false });
+    } catch (err) {
+      return scheduleRetry(err);
+    }
     const gl = renderer.gl;
+    if (!gl) {
+      return scheduleRetry();
+    }
+
+    // If WebGL is running in SOFTWARE (GPU acceleration off / blocklisted), the
+    // full-screen shader runs on the CPU and lags badly. Use the cheap CSS
+    // fallback instead of the heavy shader. Don't retry — it won't get faster.
+    const dbgInfo = gl.getExtension("WEBGL_debug_renderer_info");
+    const rendererName = dbgInfo
+      ? String(gl.getParameter(dbgInfo.UNMASKED_RENDERER_WEBGL) || "")
+      : "";
+    if (/swiftshader|software|llvmpipe|basic render|microsoft basic/i.test(rendererName)) {
+      console.warn("Orb: software WebGL detected, using lightweight fallback.", rendererName);
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      setWebglFailed(true);
+      return;
+    }
+
+    // Success — clear any fallback state and reset the retry counter.
+    setWebglFailed(false);
+    attemptsRef.current = 0;
     gl.clearColor(0, 0, 0, 0);
     container.appendChild(gl.canvas);
+
+    // If the GPU drops the context later, show the fallback and retry.
+    const handleContextLost = (e: Event) => {
+      e.preventDefault();
+      setWebglFailed(true);
+      setRetry((r) => r + 1);
+    };
+    gl.canvas.addEventListener("webglcontextlost", handleContextLost as EventListener);
 
     const geometry = new Triangle(gl);
     const program = new Program(gl, {
@@ -294,12 +349,64 @@ export default function Orb({
       window.removeEventListener('resize', resize);
       container.removeEventListener('mousemove', handleMouseMove);
       container.removeEventListener('mouseleave', handleMouseLeave);
-      container.removeChild(gl.canvas);
+      gl.canvas.removeEventListener("webglcontextlost", handleContextLost as EventListener);
+      if (gl.canvas.parentNode === container) container.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [hue, hoverIntensity, rotateOnHover, forceHoverState, backgroundColor]);
+  }, [hue, hoverIntensity, rotateOnHover, forceHoverState, backgroundColor, retry]);
 
-  return <div ref={ctnDom} className="w-full h-full" />;
+  // The WebGL canvas mounts into this container. It is ALWAYS rendered so that
+  // automatic retries (after a context frees up) can attach the canvas.
+  return (
+    <div className="relative h-full w-full overflow-hidden">
+      <div ref={ctnDom} className="absolute inset-0" />
+
+      {/* CSS fallback orb, shown only while WebGL is unavailable (GPU off / too
+          many contexts). Mimics the real shader orb: a dark sphere with a
+          glowing purple/cyan rim and a rotating highlight, using the orb's own
+          base colors (purple 265, cyan 200). */}
+      {webglFailed && (
+        <div className="absolute left-1/2 top-1/2 h-[72vmin] w-[72vmin] -translate-x-1/2 -translate-y-1/2">
+          {/* outer atmospheric glow */}
+          <div
+            className="absolute inset-0 rounded-full blur-3xl opacity-70 animate-pulse-glow"
+            style={{
+              background:
+                "radial-gradient(circle, hsl(265 90% 60% / 0.35), hsl(200 90% 60% / 0.22) 50%, transparent 70%)",
+            }}
+          />
+          {/* glowing rim of the sphere */}
+          <div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 50%, transparent 54%, hsl(200 95% 65% / 0.55) 60%, hsl(265 90% 62% / 0.5) 66%, transparent 73%)",
+            }}
+          />
+          {/* rotating bright highlight travelling around the rim */}
+          <div
+            className="absolute inset-0 rounded-full animate-[spin_16s_linear_infinite]"
+            style={{
+              background:
+                "conic-gradient(from 0deg, transparent 0deg, hsl(200 100% 80% / 0.9) 35deg, hsl(265 100% 80% / 0.4) 90deg, transparent 150deg, transparent 360deg)",
+              WebkitMaskImage:
+                "radial-gradient(circle, transparent 56%, #000 60%, #000 69%, transparent 72%)",
+              maskImage:
+                "radial-gradient(circle, transparent 56%, #000 60%, #000 69%, transparent 72%)",
+            }}
+          />
+          {/* subtle inner core */}
+          <div
+            className="absolute inset-0 rounded-full opacity-60"
+            style={{
+              background:
+                "radial-gradient(circle at 42% 40%, hsl(265 80% 55% / 0.18), transparent 55%)",
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
 }
 
 function hslToRgb(h: number, s: number, l: number) {

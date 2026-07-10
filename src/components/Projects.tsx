@@ -8,6 +8,7 @@ import pic2 from  "../assets/image2.png";
 
 import pic4 from  "../assets/image.png";
 import pic5 from  "../assets/pic5.png";
+import cgecStore from  "../assets/cgecstore.png";
 const projects = [
   {
     title: "CodeSphere",
@@ -18,6 +19,16 @@ const projects = [
     tech: ["React", "Node.js", "Socket.io", "MongoDB", "Monaco Editor"],
     live: "https://code-sphere-editor.vercel.app/",
     github: "https://github.com/SarcasticWala/Code_Sphere",
+  },
+  {
+    title: "CGEC Store",
+    subtitle: "Official CGEC Merchandise Store",
+    image: cgecStore,
+    description:
+      "The official e-commerce store for CGEC merchandise, offering branded T-shirts and apparel with product collections, cart, wishlist, and secure checkout.",
+    tech: ["Next.js", "TypeScript", "MongoDB", "Tailwind CSS", "Aceternity UI", "Shadcn UI"],
+    live: "https://cgecstore.in/",
+    github: "#",
   },
   {
     title: "Esperenza 2k25",

@@ -24,9 +24,7 @@ const Contact = memo(() => {
   const [errors, setErrors] = useState<Partial<ContactFormType>>({});
   const [sending, setSending] = useState(false);
   const { toast } = useToast();
-  const contactApiUrl =
-    import.meta.env.VITE_CONTACT_API_URL ||
-    (import.meta.env.DEV ? "https://portfolio-ayan-backend.vercel.app/api/contact" : "/api/contact");
+  const contactApiUrl = import.meta.env.VITE_CONTACT_API_URL || "/api/contact";
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

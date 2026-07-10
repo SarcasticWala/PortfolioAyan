@@ -63,6 +63,30 @@ exports[`Projects component > renders all featured projects and matches snapshot
           data-testid="project-card"
         >
           <h3>
+            CGEC Store
+          </h3>
+          <p>
+            Official CGEC Merchandise Store
+          </p>
+          <a
+            href="https://cgecstore.in/"
+          >
+            Live
+          </a>
+          <a
+            href="#"
+          >
+            GitHub
+          </a>
+        </article>
+      </div>
+      <div
+        style="opacity: 0; transform: translateY(30px);"
+      >
+        <article
+          data-testid="project-card"
+        >
+          <h3>
             Esperenza 2k25
           </h3>
           <p>

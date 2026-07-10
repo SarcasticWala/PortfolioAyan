@@ -130,6 +130,12 @@
     scroll-behavior: smooth;
   }
 
+  /* Hide the native cursor only when the custom cursor is active (desktop/fine-pointer) */
+  html.has-custom-cursor,
+  html.has-custom-cursor * {
+    cursor: none !important;
+  }
+
   h1,
   h2,
   h3,

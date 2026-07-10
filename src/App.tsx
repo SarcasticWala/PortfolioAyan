@@ -8,6 +8,9 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Orb from "@/components/Orb";
 import FloatingOrbs from "@/components/FloatingOrbs";
+import Loader from "@/components/Loader";
+import CustomCursor from "@/components/CustomCursor";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
@@ -15,10 +18,14 @@ const App = () => (
   <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <Loader />
+        <CustomCursor />
         <div className="relative min-h-screen bg-background overflow-x-hidden">
-          <div className="pointer-events-none fixed inset-0 z-0 opacity-80">
-            <Orb hue={-10} hoverIntensity={0.15} rotateOnHover={false} backgroundColor="hsl(var(--background))" />
-          </div>
+          <ErrorBoundary label="Orb">
+            <div className="pointer-events-none fixed inset-0 z-0 opacity-80">
+              <Orb hue={-10} hoverIntensity={0.15} rotateOnHover={false} backgroundColor="hsl(var(--background))" />
+            </div>
+          </ErrorBoundary>
           <div className="pointer-events-none fixed inset-0 z-[1]">
             <FloatingOrbs />
           </div>

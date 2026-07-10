@@ -27,8 +27,9 @@ describe("Projects component", () => {
     const { container } = render(<Projects />);
     const cards = screen.getAllByTestId("project-card");
 
-    expect(cards).toHaveLength(5);
+    expect(cards).toHaveLength(6);
     expect(screen.getByText("CodeSphere")).toBeInTheDocument();
+    expect(screen.getByText("CGEC Store")).toBeInTheDocument();
     expect(screen.getByText("Esperenza 2k25")).toBeInTheDocument();
     expect(screen.getByText("TathaagatFoundation")).toBeInTheDocument();
     expect(screen.getByText("Chat-A-Verse")).toBeInTheDocument();

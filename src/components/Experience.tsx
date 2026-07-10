@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import AnimatedSection from "./AnimatedSection";
 import { Award, Trophy, Star } from "lucide-react";
 import BeyondTheCode from "./BeyondTheCode ";
+import SpotlightCard from "./ui/spotlight-card";
+import WorkExperience from "./WorkExperience";
 
 
 const achievements = [
@@ -52,6 +54,23 @@ const Experience = memo(() => {
           Achievements & <span className="text-gradient">Experience</span>
         </motion.h2>
 
+        {/* Work Experience timeline */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.15 }}
+          className="mb-16"
+        >
+          <span className="text-xs font-mono uppercase tracking-widest text-primary">
+            Career timeline
+          </span>
+          <h3 className="mt-1 mb-6 text-xl sm:text-2xl font-bold text-foreground">
+            Work <span className="text-gradient">Experience</span>
+          </h3>
+          <WorkExperience />
+        </motion.div>
+
         {/* Achievements */}
         <div className="grid md:grid-cols-3 gap-6">
           {achievements.map((item, i) => (
@@ -62,17 +81,19 @@ const Experience = memo(() => {
               viewport={{ once: true }}
               transition={{ delay: i * 0.15, duration: 0.5 }}
               whileHover={{ y: -5 }}
-              className="glass-card p-6 text-center group"
+              className="group"
             >
-              <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 group-hover:glow-primary transition-all duration-300">
-                <item.icon size={24} className="text-primary" />
-              </div>
-              <h3 className="text-lg font-bold text-foreground mb-2">
-                {item.title}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {item.description}
-              </p>
+              <SpotlightCard className="glass-card" innerClassName="p-6 text-center">
+                <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 group-hover:glow-primary transition-all duration-300">
+                  <item.icon size={24} className="text-primary" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {item.description}
+                </p>
+              </SpotlightCard>
             </motion.div>
           ))}
         </div>

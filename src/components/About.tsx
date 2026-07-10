@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import AnimatedSection from "./AnimatedSection";
 import { Code2, Rocket, Heart } from "lucide-react";
 import TypewriterText from "./TypewriterText";
+import SpotlightCard from "./ui/spotlight-card";
+import RevealText from "./RevealText";
 
 const highlights = [
   { icon: Code2, label: "Clean Code", desc: "Writing maintainable, scalable solutions" },
@@ -47,19 +49,24 @@ const About = memo(() => {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="space-y-6"
           >
-            <p className="text-muted-foreground leading-relaxed text-lg">
-              I'm a passionate{" "}
-              <span className="text-foreground font-medium">Full Stack Developer</span>{" "}
-              specializing in the <span className="text-primary font-medium">MERN stack</span>. 
-              I love turning complex problems into simple, beautiful, and intuitive solutions.
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
-              With a keen eye for detail and a drive for perfection, I build web applications 
-              that not only function flawlessly but also deliver exceptional{" "}
-              <span className="text-accent font-medium">user experiences</span>. 
-              My focus is on writing clean, maintainable code and staying current with 
-              the latest technologies.
-            </p>
+            <RevealText
+              className="text-muted-foreground leading-relaxed text-lg"
+              segments={[
+                { text: "I'm a passionate " },
+                { text: "Full Stack Developer", className: "text-foreground font-medium" },
+                { text: " specializing in the " },
+                { text: "MERN stack", className: "text-primary font-medium" },
+                { text: ". I love turning complex problems into simple, beautiful, and intuitive solutions." },
+              ]}
+            />
+            <RevealText
+              className="text-muted-foreground leading-relaxed"
+              segments={[
+                { text: "With a keen eye for detail and a drive for perfection, I build web applications that not only function flawlessly but also deliver exceptional " },
+                { text: "user experiences", className: "text-accent font-medium" },
+                { text: ". My focus is on writing clean, maintainable code and staying current with the latest technologies." },
+              ]}
+            />
 
             {/* Typewriter text */}
             <div className="glass-card p-4 rounded-lg">
@@ -83,15 +90,20 @@ const About = memo(() => {
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
                 whileHover={{ x: 5 }}
-                className="glass-card p-5 flex items-center gap-4 group cursor-default"
+                className="group"
               >
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <item.icon size={20} className="text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground">{item.label}</h3>
-                  <p className="text-sm text-muted-foreground">{item.desc}</p>
-                </div>
+                <SpotlightCard
+                  className="glass-card cursor-default"
+                  innerClassName="p-5 flex items-center gap-4"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <item.icon size={20} className="text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground">{item.label}</h3>
+                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                  </div>
+                </SpotlightCard>
               </motion.div>
             ))}
           </div>
